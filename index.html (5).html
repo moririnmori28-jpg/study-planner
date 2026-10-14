@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4月完全攻略・受験勉強計画＆デイリーノルマ管理アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-full flex flex-col transition-colors duration-200">
+
+    <header class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 dark:from-slate-900 dark:via-indigo-950 dark:to-purple-950 text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black flex items-center gap-2 tracking-tight">
+                    <span>🎯</span> 4月逆算！受験参考書完全攻略コンプリートプランナー
+                </h1>
+                <p class="text-xs sm:text-sm text-indigo-100 dark:text-indigo-300">夕方・夜の完全自宅学習集中型 / 全参考書デイリーノルマ / 青チャート復習サイクル</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg text-sm transition backdrop-blur-md flex items-center gap-1">
+                    <span id="theme-toggle-icon">🌙</span>
+                    <span id="theme-toggle-text" class="text-xs hidden sm:inline">ダークモード</span>
+                </button>
+                <div class="bg-white/15 dark:bg-black/30 px-3 py-1.5 rounded-xl backdrop-blur-md text-xs flex items-center gap-2 border border-white/10">
+                    <div>
+                        <span class="text-slate-200 block text-[10px]">全体達成度</span>
+                        <span id="header-progress-text" class="font-extrabold text-base text-yellow-300">0%</span>
+                    </div>
+                </div>
+                <button onclick="resetAllData()" class="bg-rose-500/80 hover:bg-rose-600 text-white text-xs px-3 py-1.5 rounded-lg transition font-medium shadow-sm">
+                    進捗リセット
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto gap-2 no-scrollbar border-t border-indigo-500/30 dark:border-slate-800 py-2">
+            <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-white text-indigo-700 dark:bg-indigo-600 dark:text-white shadow-md transition">
+                📊 ダッシュボード
+            </button>
+            <button onclick="switchTab('targets')" id="btn-targets" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap text-white hover:bg-white/10 transition">
+                🎯 全参考書・日別/週別ノルマ
+            </button>
+            <button onclick="switchTab('routine')" id="btn-routine" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap text-white hover:bg-white/10 transition">
+                ⏰ 時間割 & 自宅集中ルーティン
+            </button>
+            <button onclick="switchTab('chart')" id="btn-chart" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap text-white hover:bg-white/10 transition">
+                🔄 青チャート復習ペース (1・3・7・14日後)
+            </button>
+            <button onclick="switchTab('weekly')" id="btn-weekly" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap text-white hover:bg-white/10 transition">
+                📅 週別進捗チェックリスト
+            </button>
+            <button onclick="switchTab('advice')" id="btn-advice" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap text-white hover:bg-white/10 transition">
+                💡 科目別重要対策 & 急所ガイド
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 overflow-y-auto">
+
+        <!-- TAB 1: DASHBOARD -->
+        <div id="dashboard" class="tab-content active space-y-6">
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">4月までの残り</p>
+                        <h3 class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1" id="days-left-count">約6ヶ月</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">目標：全参考書コンプリート</p>
+                    </div>
+                    <div class="text-3xl bg-indigo-50 dark:bg-indigo-950/50 p-3 rounded-2xl">⏳</div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">平日自宅最大学習時間</p>
+                        <h3 class="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">約 5.5 ～ 6 時間</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">夕方(17:10〜)完全自宅モード</p>
+                    </div>
+                    <div class="text-3xl bg-purple-50 dark:bg-purple-950/50 p-3 rounded-2xl">🏠</div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">土日最大学習時間</p>
+                        <h3 class="text-2xl font-black text-pink-600 dark:text-pink-400 mt-1">8 ～ 10 時間</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">休息バッファも確保</p>
+                    </div>
+                    <div class="text-3xl bg-pink-50 dark:bg-pink-950/50 p-3 rounded-2xl">⚡</div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">登録参考書 & 講座</p>
+                        <h3 class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">全 15 冊 / 講座</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">数学・物理・化学・英・古</p>
+                    </div>
+                    <div class="text-3xl bg-emerald-50 dark:bg-emerald-950/50 p-3 rounded-2xl">📚</div>
+                </div>
+            </div>
+
+            <!-- Global Progress Bar Card -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">📊 全体学習コンプリート進捗</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">各ページのチェックボックス（週別目標・青チャート復習）の達成率が即座に反映されます。</p>
+                    </div>
+                    <span id="dashboard-pct" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-700 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200 dark:border-slate-600">
+                    <div id="dashboard-progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Features Highlights -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+                    <h3 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        <span class="text-indigo-600 dark:text-indigo-400">🔥</span> 今回のスケジュール改訂ポイント（外出なし・自宅集中）
+                    </h3>
+                    <ul class="space-y-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                        <li class="flex items-start gap-2.5">
+                            <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-bold px-2 py-0.5 rounded text-xs">改訂1</span>
+                            <div><strong>夕方（17:10〜19:00）を「自宅第1集中枠」に指定:</strong> 帰宅後すぐに机に向かうことで、1時間50分のまとまった思考系科目（数学・物理）の学習時間を獲得。</div>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <span class="bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 font-bold px-2 py-0.5 rounded text-xs">改訂2</span>
+                            <div><strong>夜（20:00〜24:00）を「自宅第2集中枠」に指定:</strong> 4時間のうち、3時間を演習・1時間を予備・暗記復習にあてることで平日計5.5時間以上の高密度学習が実現。</div>
+                        </li>
+                        <li class="flex items-start gap-2.5">
+                            <span class="bg-pink-100 dark:bg-pink-950 text-pink-600 dark:text-pink-400 font-bold px-2 py-0.5 rounded text-xs">改訂3</span>
+                            <div><strong>電車通学（往復約80分）の徹底活用:</strong> 「システム英単語」と「岡本古典文法」専用ゾーンとし、自宅では問題演習に特化。</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+                    <h3 class="font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                        <span class="text-amber-500">⚡</span> 志望校合格のための鉄則ルール
+                    </h3>
+                    <div class="bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 p-4 rounded-r-xl space-y-2 text-xs sm:text-sm text-amber-900 dark:text-amber-200">
+                        <p><strong>① 青チャートは例題徹底主義:</strong> 数A範囲・EX・章末問題は除外し、重要例題を何度も反復。1・3・7・14日後の復習ペースを死守すること。</p>
+                        <p><strong>② 理科の段階的ステップアップ:</strong> 「漆原講義 ➔ リードα基礎 ➔ 良問の風 ➔ 名問の森」を順番通りに消化。すっとばすと確実に挫折します。</p>
+                        <p><strong>③ 土日は「前倒し」の意識:</strong> 土曜午前に3〜4時間集中できれば、日曜夕方はしっかり体を休めてもノルマをクリアできます。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: REFERENCE BOOKS DAILY & WEEKLY TARGETS -->
+        <div id="targets" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">🎯 全参考書・一日の目標消化数 & ノルマ一覧</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">来年4月までに全冊をマスターするための「1日あたりの目標ページ・問題数」と消化方法です。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Mathematics Card -->
+                    <div class="border border-indigo-200 dark:border-indigo-900/60 p-5 rounded-2xl bg-indigo-50/40 dark:bg-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
+                                <span>📐</span> 数学（青チャート・入門問題精講・河野塾）
+                            </h3>
+                            <span class="text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold px-2 py-0.5 rounded-full">最重点</span>
+                        </div>
+                        <ul class="text-xs sm:text-sm space-y-2.5 text-slate-700 dark:text-slate-300">
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-indigo-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">青チャート 123BC（数A除く/EX・章末除く）</div>
+                                <div class="text-indigo-600 dark:text-indigo-300 font-bold mt-1">1日 3 ～ 5 例題</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※基本例題・重要例題の解法プロセスを自分の言葉で説明できるようにする。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-indigo-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">入門問題精講 数2B（残り約半分）</div>
+                                <div class="text-indigo-600 dark:text-indigo-300 font-bold mt-1">1日 2 ～ 3 問（約3〜4ページ）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※約1ヶ月（11月中旬）で完全完了を目指す。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-indigo-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">入門問題精講 数3C（全冊）</div>
+                                <div class="text-indigo-600 dark:text-indigo-300 font-bold mt-1">1日 2 問（約4ページ）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※11月下旬開始 ➔ 1月中に1周完了させる。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-indigo-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">数A 河野塾徹底基礎講座</div>
+                                <div class="text-indigo-600 dark:text-indigo-300 font-bold mt-1">週に 2 ～ 3 講義</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※青チャートで削った「数A（確率・整数の論理）」をここで完璧に補充。</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Physics Card -->
+                    <div class="border border-purple-200 dark:border-purple-900/60 p-5 rounded-2xl bg-purple-50/40 dark:bg-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                                <span>⚛️</span> 物理（漆原・リードα・良問・名問）
+                            </h3>
+                            <span class="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold px-2 py-0.5 rounded-full">階段式マスター</span>
+                        </div>
+                        <ul class="text-xs sm:text-sm space-y-2.5 text-slate-700 dark:text-slate-300">
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-purple-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">漆原の面白いほどわかるシリーズ全冊</div>
+                                <div class="text-purple-600 dark:text-purple-300 font-bold mt-1">週 1 単元（講義リード読み）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※解法のイメージと物理現象の定性的な理解を固める。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-purple-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">リードアルファ物理（基礎問題のみ 252問）</div>
+                                <div class="text-purple-600 dark:text-purple-300 font-bold mt-1">1日 3 ～ 4 問</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※2ヶ月半（約70日）で基礎252問を全完。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-purple-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">良問の風 物理</div>
+                                <div class="text-purple-600 dark:text-purple-300 font-bold mt-1">1日 2 問</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※リードα完了後（1月以降）に入り、標準入試レベルを確立。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-purple-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">名門の森 物理</div>
+                                <div class="text-purple-600 dark:text-purple-300 font-bold mt-1">1日 1 ～ 2 問</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※2月後半〜3月に着手。難関大対策の仕上げ。</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Chemistry Card -->
+                    <div class="border border-pink-200 dark:border-pink-900/60 p-5 rounded-2xl bg-pink-50/40 dark:bg-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-pink-700 dark:text-pink-400 flex items-center gap-2">
+                                <span>🧪</span> 化学（鎌田・福間・セミナー）
+                            </h3>
+                            <span class="text-[10px] bg-pink-100 dark:bg-pink-950 text-pink-700 dark:text-pink-300 font-bold px-2 py-0.5 rounded-full">インプット＆演習</span>
+                        </div>
+                        <ul class="text-xs sm:text-sm space-y-2.5 text-slate-700 dark:text-slate-300">
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-pink-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">鎌田の理論化学（290ページ）</div>
+                                <div class="text-pink-600 dark:text-pink-300 font-bold mt-1">1日 3 ～ 4 ページ（約2.5ヶ月で1周）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※計算問題の立式根拠を理解する。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-pink-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">福間の無機化学（190ページ）</div>
+                                <div class="text-pink-600 dark:text-pink-300 font-bold mt-1">1日 3 ページ（約2ヶ月で1周）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※反応機構と色の暗記を夜の隙間に集中的に行う。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-pink-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">鎌田の有機化学（260ページ）</div>
+                                <div class="text-pink-600 dark:text-pink-300 font-bold mt-1">1日 3 ページ（約2.5ヶ月で1周）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※構造決定パズルの基本解法を蓄積する。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-pink-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">化学セミナー</div>
+                                <div class="text-pink-600 dark:text-pink-300 font-bold mt-1">各講義本の該当章が終わるごとに該当基本問題演習</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- English & Classics Card -->
+                    <div class="border border-emerald-200 dark:border-emerald-900/60 p-5 rounded-2xl bg-emerald-50/40 dark:bg-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-extrabold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                                <span>📖</span> 英語 & 古典（シス単・ポラリス1・岡本古典）
+                            </h3>
+                            <span class="text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full">通学スキマ時間中心</span>
+                        </div>
+                        <ul class="text-xs sm:text-sm space-y-2.5 text-slate-700 dark:text-slate-300">
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-emerald-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">システム英単語</div>
+                                <div class="text-emerald-600 dark:text-emerald-300 font-bold mt-1">1日 50 ～ 100 語（高速高回転）</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※通学電車（行き帰り約80分）内で完結させる。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-emerald-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">ポラリス 1 英文法</div>
+                                <div class="text-emerald-600 dark:text-emerald-300 font-bold mt-1">1日 2 テーマ / ユニット</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※解説の「なぜその答えになるか」を理由付けする。</p>
+                            </li>
+                            <li class="bg-white dark:bg-slate-700/60 p-3 rounded-xl shadow-xs border border-emerald-100 dark:border-slate-600">
+                                <div class="font-bold text-slate-900 dark:text-white">岡本梨奈の古典文法が面白いほど身につく本</div>
+                                <div class="text-emerald-600 dark:text-emerald-300 font-bold mt-1">1日 1 レッスン</div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">※助動詞の活用・接続・意味の表を完璧に暗唱する。</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DAILY ROUTINE & TIME BLOCKS -->
+        <div id="routine" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">⏰ 理想的な1週間の時間割＆自宅集中ルーティン</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">「夕方以降は外出しない」前提に基づき、帰宅後の時間を最大限に学習へ充てるモデルです。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Weekdays Mon-Thu -->
+                    <div class="bg-slate-50 dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <h3 class="font-bold text-indigo-700 dark:text-indigo-400 text-sm">月～木曜日（標準日）</h3>
+                            <span class="text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 px-2 py-0.5 rounded font-bold">平日計 5.5h 学習</span>
+                        </div>
+                        <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                            <li><strong>06:00</strong> 起床・朝準備</li>
+                            <li><strong>06:40 - 07:21</strong> 電車 ➡️ <span class="text-emerald-600 dark:text-emerald-400 font-bold">シス単 (50〜100語)</span></li>
+                            <li><strong>07:21 - 07:45</strong> 徒歩通学</li>
+                            <li><strong>07:45 - 16:00</strong> 学校授業</li>
+                            <li><strong>16:00 - 17:10</strong> 帰宅電車 ➡️ <span class="text-emerald-600 dark:text-emerald-400 font-bold">岡本古典文法 / シス単復習</span></li>
+                            <li class="bg-indigo-100/70 dark:bg-indigo-950/70 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                <strong>17:10 - 19:00 (自宅第1集中枠・1時間50分)</strong><br>
+                                🎯 <span class="font-bold text-indigo-900 dark:text-indigo-200">思考系：数学（青チャート例題 3〜5問）</span>
+                            </li>
+                            <li><strong>19:00 - 20:00</strong> 夕食・お風呂・休憩</li>
+                            <li class="bg-purple-100/70 dark:bg-purple-950/70 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                                <strong>20:00 - 24:00 (自宅第2集中枠・4時間)</strong><br>
+                                🎯 20:00 - 21:30：<span class="font-bold text-purple-900 dark:text-purple-200">物理（リードα / 良問）</span><br>
+                                🎯 21:30 - 23:00：<span class="font-bold text-purple-900 dark:text-purple-200">化学（鎌田理論/福間無機＋セミナー）</span><br>
+                                🎯 23:00 - 24:00：<span class="font-bold text-purple-900 dark:text-purple-200">ポラリス1文法 ＋ 本日の復習</span>
+                            </li>
+                            <li><strong>24:00</strong> 就寝（睡眠時間6時間確保）</li>
+                        </ul>
+                    </div>
+
+                    <!-- Friday -->
+                    <div class="bg-slate-50 dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <h3 class="font-bold text-purple-700 dark:text-purple-400 text-sm">金曜日（早帰り日）</h3>
+                            <span class="text-[10px] bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded font-bold">平日計 6.5h 学習</span>
+                        </div>
+                        <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                            <li><strong>06:00</strong> 起床・朝準備</li>
+                            <li><strong>06:40 - 07:21</strong> 電車 ➡️ <span class="text-emerald-600 dark:text-emerald-400 font-bold">シス単</span></li>
+                            <li><strong>07:21 - 07:45</strong> 徒歩通学</li>
+                            <li><strong>07:45 - 15:00</strong> 学校授業（早め終了）</li>
+                            <li><strong>15:00 - 16:10</strong> 帰宅</li>
+                            <li class="bg-purple-100/70 dark:bg-purple-950/70 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                                <strong>16:10 - 19:00 (自宅早期集中枠・2時間50分)</strong><br>
+                                🎯 <span class="font-bold text-purple-900 dark:text-purple-200">数A河野塾講座 ＋ 入門問題精講数2B/3C</span>
+                            </li>
+                            <li><strong>19:00 - 20:00</strong> 夕食・お風呂</li>
+                            <li class="bg-purple-100/70 dark:bg-purple-950/70 p-2 rounded-lg border border-purple-200 dark:border-purple-800">
+                                <strong>20:00 - 24:00 (夜間集中枠・4時間)</strong><br>
+                                🎯 <span class="font-bold text-purple-900 dark:text-purple-200">週の青チャート総復習 ＋ 物理/化学の遅れ取り戻し</span>
+                            </li>
+                            <li><strong>24:00</strong> 就寝</li>
+                        </ul>
+                    </div>
+
+                    <!-- Weekend -->
+                    <div class="bg-slate-50 dark:bg-slate-900/80 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-2">
+                            <h3 class="font-bold text-pink-700 dark:text-pink-400 text-sm">土曜・日曜日（完全自宅/図書館）</h3>
+                            <span class="text-[10px] bg-pink-100 dark:bg-pink-950 text-pink-800 dark:text-pink-300 px-2 py-0.5 rounded font-bold">休日 8〜10h 学習</span>
+                        </div>
+                        <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                            <li><strong>07:00</strong> 起床・朝食</li>
+                            <li class="bg-pink-100/70 dark:bg-pink-950/70 p-2 rounded-lg border border-pink-200 dark:border-pink-800">
+                                <strong>08:30 - 12:00 (午前集中ゴールデンタイム・3.5h)</strong><br>
+                                🎯 <span class="font-bold text-pink-900 dark:text-pink-200">重圧数学（青チャート/入門問題精講3C）</span>
+                            </li>
+                            <li><strong>12:00 - 13:00</strong> 昼食・リフレッシュ</li>
+                            <li class="bg-pink-100/70 dark:bg-pink-950/70 p-2 rounded-lg border border-pink-200 dark:border-pink-800">
+                                <strong>13:00 - 17:00 (午後演習ブロック・4h)</strong><br>
+                                🎯 <span class="font-bold text-pink-900 dark:text-pink-200">物理演習（良問/名問）＋ 化学セミナーまとめ</span>
+                            </li>
+                            <li><strong>17:00 - 19:00</strong> 自由時間・趣味・運動など（リフレッシュ）</li>
+                            <li><strong>19:00 - 20:00</strong> 夕食・お風呂</li>
+                            <li class="bg-pink-100/70 dark:bg-pink-950/70 p-2 rounded-lg border border-pink-200 dark:border-pink-800">
+                                <strong>20:00 - 22:30 (夜間ライト演習・2.5h)</strong><br>
+                                🎯 <span class="font-bold text-pink-900 dark:text-pink-200">英単語総チェック・古典文法・翌週の計画準備</span>
+                            </li>
+                            <li><strong>23:00</strong> 早めに就寝</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: BLUE CHART REVIEW PACING -->
+        <div id="chart" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">🔄 青チャート復習ペース管理 (エビングハウス記憶定着サイクル)</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                        青チャートは「1回解いて終わり」では意味がありません。初回習得から **「1日後」「3日後」「7日後」「14日後」** の4回サイクルで復習チェックを入れて完璧に定着させましょう。
+                    </p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 uppercase tracking-wider text-[11px]">
+                                <th class="p-3.5 rounded-l-xl font-bold">範囲 / 分野 (数A・EX除外)</th>
+                                <th class="p-3.5 text-center font-bold">初回習得 (Day 0)</th>
+                                <th class="p-3.5 text-center font-bold">1日後復習</th>
+                                <th class="p-3.5 text-center font-bold">3日後復習</th>
+                                <th class="p-3.5 text-center font-bold">7日後復習</th>
+                                <th class="p-3.5 text-center font-bold rounded-r-xl">14日後定着</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chart-table-body" class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: WEEKLY CHECKLISTS -->
+        <div id="weekly" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">📅 月別・週別目標チェックリスト（10月〜4月）</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">週ごとの主要達成目標です。達成したらチェックを入れると全体進捗率に反映されます。</p>
+                    </div>
+                    <button onclick="checkAllWeekly(true)" class="text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 px-3 py-2 rounded-xl font-bold transition">
+                        すべての週を達成にする
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 uppercase tracking-wider text-[11px]">
+                                <th class="p-3.5 rounded-l-xl font-bold">時期 / 週</th>
+                                <th class="p-3.5 font-bold">この週の主要ノルマ目標</th>
+                                <th class="p-3.5 text-center font-bold rounded-r-xl">達成チェック</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weekly-table-body" class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: SUBJECT ADVICE & STRATEGY -->
+        <div id="advice" class="tab-content space-y-6">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-slate-100">💡 各科目の単元別注意点 & 受験対策ノウハウ</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">志望校の合格点を叩き出すために、各参考書で絶対につまずいてはならない重要ポイントです。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div class="border border-slate-200 dark:border-slate-700 p-5 rounded-2xl space-y-3 bg-slate-50 dark:bg-slate-900/50">
+                        <h3 class="font-extrabold text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
+                            <span>📐</span> 数学の重点攻略アドバイス
+                        </h3>
+                        <ul class="text-xs sm:text-sm space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <li><strong>青チャートの正しい使い方:</strong> 答えを暗記するのではなく、「なぜその1行目の式変形を行うのか」という**理由付け**を言葉で言えるようにする。</li>
+                            <li><strong>数3C (微分積分・複素数平面):</strong> 計算量が非常に多いため、毎日必ず手で最後まで計算し切る癖をつける。</li>
+                            <li><strong>数A (河野塾):</strong> 確率と整数は問題文のパターン暗記ではなく「事象のモデリング能力」が問われるため、講義動画で考え方の根本を身につける。</li>
+                        </ul>
+                    </div>
+
+                    <div class="border border-slate-200 dark:border-slate-700 p-5 rounded-2xl space-y-3 bg-slate-50 dark:bg-slate-900/50">
+                        <h3 class="font-extrabold text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                            <span>⚛️</span> 物理の重点攻略アドバイス
+                        </h3>
+                        <ul class="text-xs sm:text-sm space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <li><strong>漆原シリーズ ➔ リードαの接続:</strong> 漆原で「作図と立式のルール」を学び、リードα基礎問題で手が勝手に動くまで計算練習を行う。</li>
+                            <li><strong>力学と電磁気の重要性:</strong> 全入試の約70%をこの2分野が占める。ここが不安定なうちは原子や波動に逃げないこと。</li>
+                            <li><strong>名門の森の注意点:</strong> 難問に時間をかけすぎず、15分考えて手が止まったらすぐ解説を見て「条件の整理方法」を学ぶ。</li>
+                        </ul>
+                    </div>
+
+                    <div class="border border-slate-200 dark:border-slate-700 p-5 rounded-2xl space-y-3 bg-slate-50 dark:bg-slate-900/50">
+                        <h3 class="font-extrabold text-pink-700 dark:text-pink-400 flex items-center gap-2">
+                            <span>🧪</span> 化学の重点攻略アドバイス
+                        </h3>
+                        <ul class="text-xs sm:text-sm space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <li><strong>鎌田の理論化学:</strong> モル計算や気体の状態方程式、平衡は「単位の追跡」と「図の作成」で立式ミスを防ぐ。</li>
+                            <li><strong>福間の無機化学:</strong> 暗記カードを作るよりも、福間の講義本を5周音読して「反応の理屈」ごと頭に叩き込む。</li>
+                            <li><strong>鎌田の有機化学:</strong> 官能基の性質・呈色反応は表にして丸暗記し、構造決定パズルの速度を極限まで高める。</li>
+                        </ul>
+                    </div>
+
+                    <div class="border border-slate-200 dark:border-slate-700 p-5 rounded-2xl space-y-3 bg-slate-50 dark:bg-slate-900/50">
+                        <h3 class="font-extrabold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
+                            <span>📖</span> 英語 & 古典の重点攻略アドバイス
+                        </h3>
+                        <ul class="text-xs sm:text-sm space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <li><strong>システム英単語:</strong> 電車内の往復80分で「1語1訳」をコンマ5秒で言えるスピード感で反復。</li>
+                            <li><strong>ポラリス1英文法:</strong> 正解の記号を選ぶだけでなく、誤りの選択肢が「なぜダメなのか」を自分の言葉で説明する。</li>
+                            <li><strong>岡本古典文法:</strong> 助動詞の活用表と「意味の識別（例:「ぬ」の完了か打ち消しか）」を完璧に頭に入れる。</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- DATA DEFINITIONS ---
+        const weeklyData = [
+            { week: "10月第1週〜第2週", task: "シス単 1-500 / 岡本古典 Lesson1-5 / 青チャート1 例題1-30 / リードα物理 1-30問 / 鎌田理論 1-40p" },
+            { week: "10月第3週〜第4週", task: "シス単 501-1000 / 入門問題精講2B 残り前半 / 青チャート1 例題31-60 / リードα物理 31-70問 / 福間無機 1-40p" },
+            { week: "11月第1週〜第2週", task: "シス単 1001-1500 / 入門問題精講2B 完了 / 青チャート2 例題1-40 / リードα物理 71-110問 / 鎌田有機 1-50p" },
+            { week: "11月第3週〜第4週", task: "シス単 1501-2000 (1周完) / 入門問題精講3C 着手 / 青チャート2 例題41-80 / リードα物理 111-150問 / ポラリス1文法 Half" },
+            { week: "12月第1週〜第2週", task: "シス単 復習2周目 / 河野塾数A 第1-4講 / 青チャートB 例題1-35 / リードα物理 151-190問 / 鎌田理論化学 完結" },
+            { week: "12月第3週〜第4週", task: "シス単 復習 / 入門問題精講3C 前半完 / 青チャートB 例題36-70 / リードα物理 基礎252問完結 / 福間無機 完結" },
+            { week: "1月第1週〜第2週", task: "青チャートC (ベクトル/複素数) / 入門問題精講3C 後半完 / 良問の風 物理 (力学) 着手 / 鎌田有機 完結" },
+            { week: "1月第3週〜第4週", task: "青チャート復習2周目集中 / 良問の風 物理 (電磁気・波動) / 化学セミナー 総合演習開始" },
+            { week: "2月第1週〜第2週", task: "河野塾数A 完結 / 良問の風 完結 / 名門の森 物理 着手 / 化学セミナー 苦手補強" },
+            { week: "2月第3週〜第4週", task: "名門の森 物理 (主要問題) / 青チャート3周目弱点克服 / 全科目過去問レベル演習" },
+            { week: "3月第1週〜第2週", task: "名門の森 物理 完結 / 理科2科目実戦演習 / 共通テスト・二次過去問総仕上げ" },
+            { week: "3月第3週〜4月直前", task: "全参考書・総点検チェック / ミスノート見直し / 受験本番・コンディション最高化" }
+        ];
+
+        const chartData = [
+            "数1：数と式・2次関数・図形と計量",
+            "数2：式と証明・複素数・図形と方程式",
+            "数2：三角関数・指数対数・微分積分",
+            "数3：極限・微分法・積分法・応用",
+            "数B：数列・統計的な推測",
+            "数C：ベクトル・平面上の曲線・複素数平面"
+        ];
+
+        // --- TAB SWITCHING LOGIC ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-white', 'text-indigo-700', 'dark:bg-indigo-600', 'dark:text-white', 'shadow-md');
+                el.classList.add('text-white', 'hover:bg-white/10');
+            });
+
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-white', 'text-indigo-700', 'dark:bg-indigo-600', 'dark:text-white', 'shadow-md');
+            activeBtn.classList.remove('text-white', 'hover:bg-white/10');
+            localStorage.setItem('planner_active_tab', tabId);
+        }
+
+        // --- DARK MODE TOGGLE ---
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('planner_dark_mode', isDark);
+            updateThemeUI(isDark);
+        }
+
+        function updateThemeUI(isDark) {
+            document.getElementById('theme-toggle-icon').innerText = isDark ? '☀️' : '🌙';
+            document.getElementById('theme-toggle-text').innerText = isDark ? 'ライトモード' : 'ダークモード';
+        }
+
+        // --- RENDER TABLES ---
+        function renderWeeklyTable() {
+            const tbody = document.getElementById('weekly-table-body');
+            tbody.innerHTML = '';
+            weeklyData.forEach((item, index) => {
+                const isChecked = localStorage.getItem('weekly_v2_' + index) === 'true';
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition border-b border-slate-100 dark:border-slate-700/50";
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.week}</td>
+                    <td class="p-3.5 text-slate-600 dark:text-slate-300">${item.task}</td>
+                    <td class="p-3.5 text-center">
+                        <input type="checkbox" id="weekly-chk-${index}" ${isChecked ? 'checked' : ''} onchange="toggleWeekly(${index})" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChartTable() {
+            const tbody = document.getElementById('chart-table-body');
+            tbody.innerHTML = '';
+            chartData.forEach((rangeText, index) => {
+                const c0 = localStorage.getItem(`chart_d0_${index}`) === 'true';
+                const c1 = localStorage.getItem(`chart_d1_${index}`) === 'true';
+                const c3 = localStorage.getItem(`chart_d3_${index}`) === 'true';
+                const c7 = localStorage.getItem(`chart_d7_${index}`) === 'true';
+                const c14 = localStorage.getItem(`chart_d14_${index}`) === 'true';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/30 transition border-b border-slate-100 dark:border-slate-700/50";
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-slate-800 dark:text-slate-200">${rangeText}</td>
+                    <td class="p-3.5 text-center"><input type="checkbox" ${c0 ? 'checked' : ''} onchange="toggleChart(${index}, 'd0')" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"></td>
+                    <td class="p-3.5 text-center"><input type="checkbox" ${c1 ? 'checked' : ''} onchange="toggleChart(${index}, 'd1')" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"></td>
+                    <td class="p-3.5 text-center"><input type="checkbox" ${c3 ? 'checked' : ''} onchange="toggleChart(${index}, 'd3')" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"></td>
+                    <td class="p-3.5 text-center"><input type="checkbox" ${c7 ? 'checked' : ''} onchange="toggleChart(${index}, 'd7')" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"></td>
+                    <td class="p-3.5 text-center"><input type="checkbox" ${c14 ? 'checked' : ''} onchange="toggleChart(${index}, 'd14')" class="w-5 h-5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleWeekly(index) {
+            const chk = document.getElementById('weekly-chk-' + index);
+            localStorage.setItem('weekly_v2_' + index, chk.checked);
+            updateProgress();
+        }
+
+        function toggleChart(index, step) {
+            const checked = event.target.checked;
+            localStorage.setItem(`chart_${step}_${index}`, checked);
+            updateProgress();
+        }
+
+        function checkAllWeekly(status) {
+            weeklyData.forEach((_, index) => {
+                localStorage.setItem('weekly_v2_' + index, status);
+            });
+            renderWeeklyTable();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let totalItems = weeklyData.length + (chartData.length * 5);
+            let completedItems = 0;
+
+            weeklyData.forEach((_, index) => {
+                if (localStorage.getItem('weekly_v2_' + index) === 'true') completedItems++;
+            });
+
+            chartData.forEach((_, index) => {
+                ['d0', 'd1', 'd3', 'd7', 'd14'].forEach(step => {
+                    if (localStorage.getItem(`chart_${step}_${index}`) === 'true') completedItems++;
+                });
+            });
+
+            const pct = Math.round((completedItems / totalItems) * 100);
+            document.getElementById('header-progress-text').innerText = pct + '%';
+            document.getElementById('dashboard-pct').innerText = pct + '%';
+            document.getElementById('dashboard-progress-bar').style.width = pct + '%';
+        }
+
+        function resetAllData() {
+            if (confirm("全ての学習進捗データを初期化しますか？")) {
+                localStorage.clear();
+                renderWeeklyTable();
+                renderChartTable();
+                updateProgress();
+                alert("進捗データを初期化しました。");
+            }
+        }
+
+        // --- APP INITIALIZATION ---
+        window.onload = function() {
+            // Theme setup
+            const isDark = localStorage.getItem('planner_dark_mode') === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            }
+            updateThemeUI(isDark);
+
+            // Tab setup
+            const savedTab = localStorage.getItem('planner_active_tab') || 'dashboard';
+            switchTab(savedTab);
+
+            // Render tables & progress
+            renderWeeklyTable();
+            renderChartTable();
+            updateProgress();
+        };
+    </script>
+</body>
+</html>
